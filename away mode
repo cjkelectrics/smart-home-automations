@@ -1,0 +1,49 @@
+blueprint:
+  name: Away Mode Presence Simulation
+  description: Turns lights on/off randomly to simulate someone being home when Away Mode is active.
+  domain: automation
+  input:
+    away_mode_toggle:
+      name: Away Mode Toggle
+      description: The input_boolean that activates Away Mode
+      selector:
+        entity:
+          domain: input_boolean
+    presence_lights:
+      name: Lights to simulate presence
+      description: List of lights that will turn on/off randomly
+      selector:
+        target:
+          entity:
+            domain: light
+
+mode: restart
+trigger:
+  - platform: state
+    entity_id: !input away_mode_toggle
+    to: "on"
+
+condition: []
+
+action:
+  - repeat:
+      until:
+        - condition: state
+          entity_id: !input away_mode_toggle
+          state: "off"
+      sequence:
+        - variables:
+            selected_light: "{{ expand(!input presence_lights)|random }}"
+            brightness: "{{ range(40,90)|random }}"
+        - service: light.turn_on
+          target:
+            entity_id: "{{ selected_light.entity_id }}"
+          data:
+            brightness_pct: "{{ brightness }}"
+        - delay:
+            minutes: "{{ range(10,20)|random }}"
+        - service: light.turn_off
+          target:
+            entity_id: "{{ selected_light.entity_id }}"
+        - delay:
+            minutes: "{{ range(5,15)|random }}"
