@@ -35,8 +35,7 @@ variables:
 
 trigger:
   - platform: state
-    entity_id: !input party_toggle_button
-    to: "pressed"
+    entity_id: input_boolean.party_mode
 
 action:
   - choose:
