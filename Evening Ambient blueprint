@@ -1,53 +1,17 @@
-blueprint:
-  name: Evening Ambient Lighting
-  description: Turns lights on at a chosen evening time with adjustable brightness and color temperature
-  domain: automation
-
-  input:
-    light_target:
-      name: Light
-      description: The light to turn on
-      selector:
-        entity:
-          domain: light
-
-    trigger_time:
-      name: Trigger Time
-      description: Time to turn on lights in the evening
-      default: "19:00:00"
-      selector:
-        time: {}
-
-    brightness_level:
-      name: Brightness
-      description: Brightness level (0-255)
-      default: 120
-      selector:
-        number:
-          min: 0
-          max: 255
-          unit_of_measurement: "brightness"
-
-    color_temp_level:
-      name: Color Temperature
-      description: Color temperature in mireds
-      default: 400
-      selector:
-        number:
-          min: 153
-          max: 500
-          unit_of_measurement: "mireds"
-
+alias: Evening Ambient Lights
+description: Turn on ambient lights in the evening
 trigger:
   - platform: time
-    at: !input trigger_time
-
+    at: "19:00:00"  # Change this to the time you want lights to turn on
+condition: []
 action:
-  - service: light.turn_on
+  - service: light.turn_on   # Use switch.turn_on if your device is a switch
     target:
-      entity_id: !input light_target
+      entity_id:
+        - light.living_room_ambient  # Replace with your correct entity ID
+        - light.bedroom_ambient      # Add more lights if needed
     data:
-      brightness: !input brightness_level
-      color_temp: !input color_temp_level
-
+      brightness: 150               # Optional: adjust brightness 0-255
+      color_temp: 350               # Optional: adjust color temperature
 mode: single
+   
