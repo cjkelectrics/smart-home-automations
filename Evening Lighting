@@ -1,0 +1,16 @@
+alias: Evening Ambient Lights
+description: Turn on selected ambient lights in the evening
+mode: single
+trigger:
+  - platform: time
+    at: "19:00:00"  # Change this to your preferred evening time
+condition: []
+action:
+  - service: light.turn_on   # Use switch.turn_on if controlling a switch instead of a light
+    target:
+      entity_id:
+        - light.living_room_ambient  # Replace with your actual entity ID
+        - light.bedroom_ambient      # Add more lights here if needed
+    data:
+      brightness: 150               # Optional: adjust brightness (0-255)
+      color_temp: 350               # Optional: adjust color temperature
