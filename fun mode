@@ -1,0 +1,72 @@
+blueprint:
+  name: Fun Mode Lights
+  description: >
+    Turn selected lights on with custom colors and brightness for a fun mode.
+  domain: automation
+  input:
+    trigger_button:
+      name: Trigger Button
+      description: The button that triggers Fun Mode
+      selector:
+        entity:
+          domain: input_boolean
+    lights:
+      name: Lights
+      description: Select the lights you want to control
+      selector:
+        target:
+          entity:
+            domain: light
+            multiple: true
+    colors:
+      name: RGB Colors
+      description: Colors to assign to each light in order
+      default: []
+      selector:
+        object:
+          multiple: true
+          properties:
+            light:
+              name: Light
+              description: Choose light from the selected devices
+              selector:
+                entity:
+                  domain: light
+            color:
+              name: RGB Color
+              description: Color for this light
+              selector:
+                color_rgb: true
+    brightness:
+      name: Brightness %
+      description: Optional brightness percentage for all lights
+      default: 100
+      selector:
+        number:
+          min: 1
+          max: 100
+          unit_of_measurement: "%"
+          
+trigger:
+  - platform: state
+    entity_id: !input 'trigger_button'
+    to: 'on'
+
+action:
+  - variables:
+      lights_list: !input 'lights'
+      colors_list: !input 'colors'
+      brightness_level: !input 'brightness'
+  - repeat:
+      for_each: "{{ lights_list }}"
+      sequence:
+        - service: light.turn_on
+          target:
+            entity_id: "{{ repeat.item }}"
+          data:
+            brightness_pct: "{{ brightness_level }}"
+            rgb_color: >
+              {% for c in colors_list if c.light == repeat.item %}
+                {{ c.color }}
+              {% endfor %}
+mode: single
